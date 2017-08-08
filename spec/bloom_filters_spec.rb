@@ -5,7 +5,7 @@ require_relative '../bloom_filters'
 
 describe BloomFilterSet do
   subject do
-    BloomFilterSet.new (1024 * 8)
+    BloomFilterSet.new words.count
   end
 
   let(:words) { File.read('/usr/share/dict/words').split("\n") }
@@ -36,7 +36,7 @@ describe BloomFilterSet do
     end
   end
 
-  it 'should have less than 1% false positives' do
+  it 'show the false positives' do
     falses = 0
 
     words.each { |word| subject.add word }

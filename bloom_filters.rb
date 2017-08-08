@@ -1,11 +1,12 @@
 require 'digest'
 
 class BloomFilterSet
-  BITMAP_SIZE = 1 << 18
+  UNPACK_FORMAT = 'L*'.freeze
 
   def initialize bitmap_size
-    @digester = Digest::MD5.new
-    @bitmap = "\x00" * (BITMAP_SIZE / 8)
+    @bitmap_bits = bitmap_size * 8
+    @digester = Digest::SHA256.new
+    @bitmap = "\x00" * bitmap_size
   end
 
   def add item
@@ -16,8 +17,10 @@ class BloomFilterSet
     hashes(item).all? { |hash| get_bit hash }
   end
 
+  private
+
   def hashes item
-    @digester.digest(item).unpack('LL').map { |hash| hash % BITMAP_SIZE }
+    @digester.digest(item).unpack(UNPACK_FORMAT).map { |hash| hash % @bitmap_bits }
   end
 
   def set_bit position
